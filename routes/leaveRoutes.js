@@ -1,11 +1,11 @@
 const express = require('express');
+const { getLeaves, createLeave, updateLeaveStatus } = require('../controllers/leaveController');
+const { authenticate, authorize } = require('../middleware/authMiddleware');
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
-const roleMiddleware = require('../middleware/roleMiddleware');
-const { createLeave, getLeaves, updateLeaveStatus } = require('../controllers/leaveController');
 
-router.post('/', protect, createLeave);
-router.get('/', protect, getLeaves);
-router.put('/:id/status', protect, roleMiddleware(['SystemAdmin', 'Admin', 'Supervisor']), updateLeaveStatus);
+router.use(authenticate);
+router.get('/', getLeaves);
+router.post('/', authorize(['Agent']), createLeave);
+router.put('/:id/status', authorize(['SystemAdmin', 'Admin', 'Supervisor']), updateLeaveStatus);
 
 module.exports = router;
